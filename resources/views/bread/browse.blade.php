@@ -47,12 +47,12 @@
                             <form method="get" class="form-search">
                                 <div id="search-input">
                                     <select id="search_key" name="key">
-                                        @foreach($searchable as $key)
-                                            <option value="{{ $key }}" @if($search->key == $key || $key == $defaultSearchKey){{ 'selected' }}@endif>{{ ucwords(str_replace('_', ' ', $key)) }}</option>
+                                        @foreach($dataType->browseRows as $row)
+                                            <option value="{{ $row->field }}" @if($search->key == $row->field || $row->field == $defaultSearchKey){{ 'selected' }}@endif>{{ $row->display_name }}</option>
                                         @endforeach
                                     </select>
                                     <select id="filter" name="filter">
-                                        <option value="contains" @if($search->filter == "contains"){{ 'selected' }}@endif>contains</option>
+                                        <option value="contains" @if($search->filter == "contains"){{ 'selected' }}@endif>包含</option>
                                         <option value="equals" @if($search->filter == "equals"){{ 'selected' }}@endif>=</option>
                                     </select>
                                     <div class="input-group col-md-12">

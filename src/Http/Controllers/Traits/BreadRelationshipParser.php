@@ -11,8 +11,10 @@ trait BreadRelationshipParser
     protected function removeRelationshipField(DataType $dataType, $bread_type = 'browse')
     {
         $forget_keys = [];
-        foreach ($dataType->{$bread_type.'Rows'} as $key => $row) {
+        $relationships = [];
+        foreach ($dataType->{$bread_type.'Rows'} as $row) {
             if ($row->type == 'relationship') {
+                $relationships[$row->field] = $row->details;
                 if ($row->details->type == 'belongsTo') {
                     $relationshipField = @$row->details->column;
                     $keyInCollection = key($dataType->{$bread_type.'Rows'}->where('field', '=', $relationshipField)->toArray());
@@ -20,10 +22,11 @@ trait BreadRelationshipParser
                 }
             }
         }
-
         foreach ($forget_keys as $forget_key) {
             $dataType->{$bread_type.'Rows'}->forget($forget_key);
         }
+
+        return $relationships;
     }
 
     /**

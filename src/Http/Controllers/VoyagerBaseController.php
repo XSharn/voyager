@@ -83,11 +83,31 @@ class VoyagerBaseController extends Controller
 
             // If a column has a relationship associated with it, we do not want to show that field
             $this->removeRelationshipField($dataType, 'browse');
-
+            $relationships = $this->removeRelationshipField($dataType, 'browse');
             if ($search->value != '' && $search->key && $search->filter) {
                 $search_filter = ($search->filter == 'equals') ? '=' : 'LIKE';
                 $search_value = ($search->filter == 'equals') ? $search->value : '%'.$search->value.'%';
-                $query->where($search->key, $search_filter, $search_value);
+                if (isset($relationships[$search->key])) {
+                    $tempDataType = $relationships[$search->key];
+                    switch ($tempDataType->type) {
+                        case 'belongsTo':
+                            $query->whereIn($tempDataType->column, function ($sub) use ($tempDataType, $search_filter, $search_value) {
+                                $sub->select($tempDataType->key)
+                                    ->from($tempDataType->table)
+                                    ->where($tempDataType->label, $search_filter, $search_value);
+                            });
+                            // use joinsub
+                            // $subQuery = DB::table($tempDataType->table)
+                            //     ->where($tempDataType->label, $search_filter, $search_value)
+                            //     ->select([$tempDataType->key]);
+                            break;
+                        default:
+                            # code...
+                            break;
+                    }
+                } else {
+                    $query->where($search->key, $search_filter, $search_value);
+                }
             }
 
             if ($orderBy && in_array($orderBy, $dataType->fields())) {
