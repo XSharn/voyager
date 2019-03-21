@@ -54,4 +54,10 @@ class VoyagerAuthController extends Controller
     {
         return config('voyager.user.redirect', route('voyager.dashboard'));
     }
+
+    //修改为用户名登陆
+    public function username()
+    {
+        return 'name';
+    }
 }
